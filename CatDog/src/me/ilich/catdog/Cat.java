@@ -15,6 +15,26 @@ public class Cat extends Animal implements Catable {
 
     private String age = "100";
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Cat cat = (Cat) o;
+
+        if (tailLegth != cat.tailLegth) return false;
+        if (!color.equals(cat.color)) return false;
+        return age.equals(cat.age);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = color.hashCode();
+        result = 31 * result + tailLegth;
+        result = 31 * result + age.hashCode();
+        return result;
+    }
+
     public Cat(int age, String color, int tailLength) {
         super(age);
         this.color = color;
