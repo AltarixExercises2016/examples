@@ -25,7 +25,6 @@ public class Dog extends Animal implements Dogable {
 
     public static void bar(){
         new Class1();
-        new Class2();
     }
 
     static class Class1{
