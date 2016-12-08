@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Notepad</string>
+    <string name="app_name">Блокнот</string>
     <string name="menu_about">О приложении</string>
     <string name="title_about">О приложении</string>
     <string name="about_github">github</string>
