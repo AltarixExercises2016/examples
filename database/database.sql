@@ -1,3 +1,17 @@
+DROP TABLE A;
+CREATE TABLE A (a TEXT);
+INSERT INTO A (a) VALUES ("1"), ("2"), ("3");
+DROP TABLE B;
+CREATE TABLE B (b TEXT);
+INSERT INTO B (b) VALUES ("3"), ("4");
+SELECT * FROM A;
+SELECT * FROM B;
+
+SELECT A.a, B.b FROM A CROSS JOIN B;
+SELECT A.a, B.b FROM A INNER JOIN B ON A.a = B.b;
+SELECT A.a, B.b FROM A LEFT JOIN B ON A.a = B.b;
+
+
 PRAGMA foreign_keys=ON;
 
 DROP TABLE priorities;
@@ -30,6 +44,8 @@ UPDATE priorities SET title = "критичный" WHERE _id = 3;
 SELECT * FROM priorities;
 
 
+
+
 CREATE TABLE notes (
 	_id INTEGER PRIMARY KEY,
 	subject TEXT NOT NULL,
@@ -37,34 +53,15 @@ CREATE TABLE notes (
 	FOREIGN KEY(priority_id) REFERENCES priorities(_id)
 );
 
-CREATE TABLE tags (
-	_id INTEGER PRIMARY KEY,
-	tag TEXT
-);
-
-CREATE TABLE notes_tags (
-	_id INTEGER PRIMARY KEY,
-	note_id INTEGER NOT NULL,
-	tag_id INTEGER NOT NULL,
-	FOREIGN KEY(note_id) REFERENCES notes(_id),
-	FOREIGN KEY(tag_id) REFERENCES tags(_id),
-	UNIQUE (note_id, tag_id) ON CONFLICT REPLACE
-);
-
-INSERT INTO
-	priorities(_id, title)
-VALUES
-	(0, "низкий"),
-	(1, "нормальный"),
-	(2, "высокий"), 
-	(3, "кретичный");
-	
-SELECT * FROM priorities;
-		
 INSERT INTO
 	notes (subject)
-VALUE
+VALUES
 	("заметка без приоритета");
+	
+INSERT INTO
+	notes (subject, priority_id)
+VALUES
+	("невозможная заметка", 99);
 
 INSERT INTO
 	notes (subject, priority_id)
@@ -75,20 +72,24 @@ VALUES
 	("первая нормальная заметка", 1),
 	("вторая нормальная заметка", 1),
 	("очень важная заметка", 2);
-	
-INSERT INTO
-	notes (subject, priority_id)
-VALUES
-	("невозможная заметка", 99);
 
-SELECT * FROM priorities;
 SELECT * FROM notes;
-SELECT * FROM tags;
-SELECT * FROM notes_tags;
 
-DELETE FROM priorities WHERE _id = 2;
-DELETE FROM notes WHERE priority_id = 2;
+SELECT COUNT(notes._id), priorities.title
+FROM notes
+LEFT JOIN priorities ON priorities._id = notes.priority_id
+GROUP BY notes.priority_id;
+	
+SELECT COUNT(notes._id), priorities.title
+FROM notes
+CROSS JOIN priorities ON priorities._id = notes.priority_id
+GROUP BY notes.priority_id;
+	
 
+CREATE TABLE tags (
+	_id INTEGER PRIMARY KEY,
+	tag TEXT
+);
 
 INSERT INTO
 	tags(_id, tag)
@@ -97,12 +98,24 @@ VALUES
 	(2, "тэг 2"),
 	(3, "тэг 3");
 	
+
+CREATE TABLE notes_tags (
+	_id INTEGER PRIMARY KEY,
+	note_id INTEGER NOT NULL,
+	tag_id INTEGER NOT NULL,
+	FOREIGN KEY(note_id) REFERENCES notes(_id),
+	FOREIGN KEY(tag_id) REFERENCES tags(_id),
+	UNIQUE (note_id, tag_id) ON CONFLICT REPLACE
+);
+	
+	
 INSERT INTO
 	notes_tags (note_id, tag_id)
 VALUES
 	(0, 0),
 	(0, 1),
 	(1, 1);
+	
 
 SELECT notes._id, notes.subject, GROUP_CONCAT(tags.tag)
 FROM notes
